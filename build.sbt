@@ -57,7 +57,7 @@ libraryDependencies ++= Seq(
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-testkit" % `akka-version` % Test withSources(),
   "com.typesafe.akka" %% "akka-http-testkit" % `akka-http-version` % Test withSources(),
-  "com.github.UKHomeOffice" % "io-scala-lib" % `io-scala-lib-version` % Test classifier "tests" withSources(),
+  "com.github.UKHomeOffice" %% "io-scala-lib" % `io-scala-lib-version` % Test classifier "tests" withSources(),
   "com.github.UKHomeOffice" %% "test-scala-lib" % `test-scala-lib-version` % Test classifier "tests" withSources()
 )
 
