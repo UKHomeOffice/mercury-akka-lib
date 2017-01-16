@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.akka.http
 
 import akka.http.scaladsl.model.MediaTypes._
-import akka.http.scaladsl.model.StatusCodes.{UnprocessableEntity, _}
+import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.{ExceptionHandler, MethodRejection, RejectionHandler, Route}
 import org.json4s._
 import org.specs2.mutable.Specification

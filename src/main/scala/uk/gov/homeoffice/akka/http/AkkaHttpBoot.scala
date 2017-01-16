@@ -48,6 +48,8 @@ trait AkkaHttpBoot extends RouteConcatenation with Logging {
     val serverBinding = Http().bindAndHandle(route, "0.0.0.0", config.port)
 
     sys addShutdownHook {
+      warn("System shutting down...")
+
       serverBinding
         .flatMap(_.unbind()) // Trigger unbinding from the port
         .onComplete { _ => system.terminate() }
