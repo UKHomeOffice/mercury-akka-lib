@@ -55,8 +55,8 @@ To run integration specs:
 sbt it:test 
 ```
 
-SBT - Revolver
---------------
+SBT - Revolver (keep things going while developing/testing)
+-----------------------------------------------------------
 sbt-revolver is a plugin for SBT enabling a super-fast development turnaround for your Scala applications:
 
 See https://github.com/spray/sbt-revolver
@@ -199,4 +199,34 @@ object ClusterActorSystemExampleApp extends App with Network {
     ...
   }
 }    
+```
+
+Releasing
+---------
+Version control of this library can be achieved through the SBT Release plugin e.g.
+```
+sbt release
+```
+
+where the following default value will be chosen:
+- Continue with snapshots dependencies: no
+- Release Version: current version without the qualifier (eg. 1.2.0-SNAPSHOT -> 1.2.0)
+- Next Version: increase the minor version segment of the current version and set the qualifier to '-SNAPSHOT' (eg. 1.2.1-SNAPSHOT -> 1.3.0-SNAPSHOT)
+- VCS tag: abort if the tag already exists
+- VCS push:
+    - Abort if no remote tracking branch is set up.
+    - Abort if remote tracking branch cannot be checked (eg. via git fetch).
+    - Abort if the remote tracking branch has unmerged commits.
+    - Set release version and next version as command arguments
+
+You can set the release version using the argument release-version and next version with next-version.
+
+Example (within sbt):
+```
+release release-version 1.0.99 next-version 1.2.0-SNAPSHOT
+```
+
+or
+```
+release with-defaults
 ```
