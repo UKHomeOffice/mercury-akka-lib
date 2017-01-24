@@ -10,10 +10,10 @@ resolvers ++= Seq(
 )
 
 val `akka-version` = "2.4.16"
-val `akka-http-version` = "10.0.1"
+val `akka-http-version` = "10.0.2"
 val `akka-http-json-version` = "1.11.0"
-val `io-scala-lib-version` = "1.9.6"
-val `test-scala-lib-version` = "1.4.3"
+val `io-scala-lib-version` = "1.9.7"
+val `test-scala-lib-version` = "1.4.4"
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % `akka-version` withSources(),
