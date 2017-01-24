@@ -324,8 +324,8 @@ class ClusterActorSystemSpec(implicit env: ExecutionEnv) extends Specification w
 
       // Singleton actor can still be pinged
       eventually(retries = 10, sleep = 10 seconds) {
-        val pongedAgain = ping(clusteredActorSystem2, s"/user/ping-actor/singleton")
-        pongedAgain must beEqualTo(true).await
+        val pongedAgain = Await.result(ping(clusteredActorSystem2, s"/user/ping-actor/singleton"), 5 seconds)
+        pongedAgain must beTrue
       }
     }
   }
