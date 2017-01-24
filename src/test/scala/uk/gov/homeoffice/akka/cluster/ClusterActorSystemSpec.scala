@@ -6,11 +6,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future, Promise}
 import akka.actor.{Actor, ActorPath, ActorSystem, PoisonPill, Props}
+import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Subscribe}
 import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings}
-import akka.cluster.{Cluster, MemberStatus}
 import com.typesafe.config.ConfigFactory
 import org.specs2.concurrent.ExecutionEnv
 import org.specs2.execute.{AsResult, Result}
@@ -208,21 +208,22 @@ class ClusterActorSystemSpec(implicit env: ExecutionEnv) extends Specification w
     }
 
     "run singleton actor for 2 running nodes" in new Context {
-      val (cluster, clusteredActorSystems @ Seq(clusteredActorSystem1, _)) = clusterActorSystems(2)
+      val (cluster, clusteredActorSystems @ Seq(clusteredActorSystem1, clusteredActorSystem2)) = clusterActorSystems(2)
 
       clusteredActorSystems.zipWithIndex foreach { case (clusteredActorSystem, index) =>
         clusteredActorSystem.actorOf(PingActor.props(clusteredActorSystem, index + 1), "ping-actor")
       }
 
-      eventually(retries = 10, sleep = 2 seconds) {
-        val members = cluster.state.members filter { _.status == MemberStatus.Up }
-        members.size mustEqual 2
+      twice {
+        eventuallyExpectMsg[MemberJoined] {
+          case MemberJoined(_) => ok
+        }
       }
 
       // With 2 nodes running, a singleton actor can be pinged.
       eventually(retries = 10, sleep = 10 seconds) {
-        val ponged = ping(clusteredActorSystem1, s"/user/ping-actor/singleton")
-        ponged must beEqualTo(true).await
+        val ponged = Await.result(ping(clusteredActorSystem1, s"/user/ping-actor/singleton"), 5 seconds)
+        ponged must beTrue
       }
     }
 
@@ -233,6 +234,12 @@ class ClusterActorSystemSpec(implicit env: ExecutionEnv) extends Specification w
 
       clusteredActorSystems.zipWithIndex foreach { case (clusteredActorSystem, index) =>
         clusteredActorSystem.actorOf(PingActor.props(clusteredActorSystem, index + 1), "ping-actor")
+      }
+
+      twice {
+        eventuallyExpectMsg[MemberJoined] {
+          case MemberJoined(_) => ok
+        }
       }
 
       // With 2 nodes running, a singleton actor can be pinged by publishing to a known "topic".
@@ -261,15 +268,16 @@ class ClusterActorSystemSpec(implicit env: ExecutionEnv) extends Specification w
         clusteredActorSystem.actorOf(PingActor.props(clusteredActorSystem, index + 1), "ping-actor")
       }
 
-      eventually(retries = 10, sleep = 2 seconds) {
-        val members = cluster.state.members filter { _.status == MemberStatus.Up }
-        members.size mustEqual 2
+      twice {
+        eventuallyExpectMsg[MemberJoined] {
+          case MemberJoined(_) => ok
+        }
       }
 
       // With 2 nodes running, a singleton actor can be pinged.
       eventually(retries = 10, sleep = 10 seconds) {
-        val ponged = ping(clusteredActorSystem1, s"/user/ping-actor/singleton")
-        ponged must beEqualTo(true).await
+        val ponged = Await.result(ping(clusteredActorSystem1, s"/user/ping-actor/singleton"), 5 seconds)
+        ponged must beTrue
       }
 
       // 1 node leaves the cluster.
@@ -295,15 +303,16 @@ class ClusterActorSystemSpec(implicit env: ExecutionEnv) extends Specification w
         clusteredActorSystem.actorOf(PingActor.props(clusteredActorSystem, index + 1), "ping-actor")
       }
 
-      eventually(retries = 10, sleep = 2 seconds) {
-        val members = cluster.state.members filter { _.status == MemberStatus.Up }
-        members.size mustEqual 3
+      times(3) {
+        eventuallyExpectMsg[MemberJoined] {
+          case MemberJoined(_) => ok
+        }
       }
 
       // With 3 nodes running, a singleton actor can be pinged.
       eventually(retries = 10, sleep = 10 seconds) {
-        val ponged = ping(clusteredActorSystem1, s"/user/ping-actor/singleton")
-        ponged must beEqualTo(true).await
+        val ponged = Await.result(ping(clusteredActorSystem1, s"/user/ping-actor/singleton"), 5 seconds)
+        ponged must beTrue
       }
 
       // 1 node leaves the cluster.
