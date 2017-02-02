@@ -1,6 +1,5 @@
 package uk.gov.homeoffice.akka
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import akka.actor.{Actor, Cancellable, Props}
 import akka.event.LoggingReceive

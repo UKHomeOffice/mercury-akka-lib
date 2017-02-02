@@ -1,7 +1,6 @@
 package uk.gov.homeoffice.akka
 
 import java.util.concurrent.TimeUnit
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import akka.actor.{Actor, Props}

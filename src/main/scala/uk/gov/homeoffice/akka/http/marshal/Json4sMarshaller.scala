@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.akka.http.marshal
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import akka.http.scaladsl.marshalling.Marshaller
 import akka.http.scaladsl.model.ContentTypes._
 import akka.http.scaladsl.model.StatusCodes._
@@ -13,8 +13,6 @@ import uk.gov.homeoffice.json.JsonFormats
 object Json4sMarshaller extends Json4sMarshaller
 
 trait Json4sMarshaller extends JsonFormats with Logging {
-  import scala.concurrent.ExecutionContext.Implicits.global
-
   val jsonMarshal: (StatusCode, JValue) => HttpResponse = { case (statusCode, json) =>
     HttpResponse(status = statusCode, entity = HttpEntity(`application/json`, pretty(render(json))))
   }
@@ -23,17 +21,17 @@ trait Json4sMarshaller extends JsonFormats with Logging {
     jsonMarshal(OK, json)
   }
 
-  implicit val jsonDefaultFutureMarshaller = Marshaller.withFixedContentType[Future[JValue], Future[HttpResponse]](`application/json`) {
+  implicit val jsonMarshaller = Marshaller.withFixedContentType[(StatusCode, JValue), HttpResponse](`application/json`) { case (statusCode, json) =>
+    jsonMarshal(statusCode, json)
+  }
+
+  implicit def jsonDefaultFutureMarshaller(implicit ec: ExecutionContext) = Marshaller.withFixedContentType[Future[JValue], Future[HttpResponse]](`application/json`) {
     _.map { json =>
       jsonMarshal(OK, json)
     }
   }
 
-  implicit val jsonMarshaller = Marshaller.withFixedContentType[(StatusCode, JValue), HttpResponse](`application/json`) { case (statusCode, json) =>
-    jsonMarshal(statusCode, json)
-  }
-
-  implicit val jsonFutureMarshaller = Marshaller.withFixedContentType[Future[(StatusCode, JValue)], Future[HttpResponse]](`application/json`) {
+  implicit def jsonFutureMarshaller(implicit ec: ExecutionContext) = Marshaller.withFixedContentType[Future[(StatusCode, JValue)], Future[HttpResponse]](`application/json`) {
     _.map { case (statusCode, json) =>
       jsonMarshal(statusCode, json)
     }

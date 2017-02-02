@@ -1,6 +1,5 @@
 package uk.gov.homeoffice.akka.schedule
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import akka.actor._
 import uk.gov.homeoffice.configuration.ConfigFactorySupport
@@ -11,6 +10,8 @@ trait Scheduler extends ActorLogging with ActorInitialisationLog with ConfigFact
   private var cancellable: Cancellable = _
 
   val schedule: Cancellable
+
+  implicit val executionContextExecutor = context.dispatcher
 
   def schedule(initialDelay: Duration = 0 seconds, interval: Duration, receiver: ActorRef = self, message: Any = Protocol.Schedule) =
     context.system.scheduler.schedule(initialDelay, interval, receiver, message)
