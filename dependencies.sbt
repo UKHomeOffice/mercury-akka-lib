@@ -12,7 +12,7 @@ resolvers ++= Seq(
 val `akka-version` = "2.4.16"
 val `akka-http-version` = "10.0.3"
 val `akka-http-json-version` = "1.12.0"
-val `io-scala-lib-version` = "1.9.10"
+val `io-scala-lib-version` = "1.9.11"
 val `test-scala-lib-version` = "1.4.4"
 
 libraryDependencies ++= Seq(
