@@ -9,7 +9,7 @@ import org.specs2.matcher.{MatchResult, _}
 trait ActorExpectations {
   this: TestKitBase =>
 
-  private val matchMsgType: PartialFunction[Any, Boolean] = PartialFunction.empty
+  private val matchMsgTypeOnly: PartialFunction[Any, Boolean] = PartialFunction.empty
 
   /**
     * An Actor may receive multiple messages, but you are only interested in one particular message.
@@ -19,10 +19,10 @@ trait ActorExpectations {
     * @tparam T Type of the message that is expected
     * @return MatchResult of "ok" if a valid expectation, otherwise "ko".
     */
-  def eventuallyExpectMsg[T](pf: PartialFunction[Any, Boolean] = matchMsgType, timeout: Duration = 30 seconds)(implicit c: ClassTag[T]): MatchResult[Any] = {
+  def eventuallyExpectMsg[T](pf: PartialFunction[Any, Boolean] = matchMsgTypeOnly, timeout: Duration = 30 seconds)(implicit c: ClassTag[T]): MatchResult[Any] = {
     val message = fishForMessage(max = timeout) {
       pf orElse {
-        case m if pf == matchMsgType && classTag[T].runtimeClass.isInstance(m) => true
+        case m if pf == matchMsgTypeOnly && classTag[T].runtimeClass.isInstance(m) => true
         case _ => false
       }
     }
