@@ -4,14 +4,6 @@ organization := "uk.gov.homeoffice"
 
 scalaVersion := "2.11.8"
 
-fork in run := true
-
-fork in Test := true
-
-publishArtifact in Test := true
-
-javaOptions in Test += "-Dconfig.resource=application.test.conf"
-
 scalacOptions ++= Seq(
   "-feature",
   "-language:implicitConversions",
@@ -22,6 +14,16 @@ scalacOptions ++= Seq(
   "-Yrangepos",
   "-Yrepl-sync"
 )
+
+javaOptions in Test += "-Dconfig.resource=application.test.conf"
+
+fork in run := true
+
+fork in Test := true
+
+publishArtifact in Test := true
+
+enablePlugins(SiteScaladocPlugin)
 
 lazy val IT = config("it") extend Test
 
