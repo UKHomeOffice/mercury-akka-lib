@@ -1,4 +1,4 @@
-name := "akka-scala-lib"
+name := "mercury-akka-lib"
 
 organization := "uk.gov.homeoffice"
 
